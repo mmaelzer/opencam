@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/mmaelzer/cam"
+	"github.com/mmaelzer/opencam/settings"
 )
 
 func stream(camera *cam.Camera) http.HandlerFunc {
@@ -55,8 +56,13 @@ func stream(camera *cam.Camera) http.HandlerFunc {
 }
 
 func Serve(camera *cam.Camera) {
-	http.Handle("/", http.FileServer(http.Dir("client/")))
-	http.Handle("/video", http.FileServer(http.Dir("videos/")))
+	static := http.FileServer(http.Dir("client/"))
+	http.Handle("/", static)
+
+	vpath := settings.GetString("output")
+	videos := http.FileServer(http.Dir(vpath))
+	http.Handle("/video/", http.StripPrefix("/video/", videos))
+
 	http.HandleFunc("/stream", stream(camera))
 	panic(http.ListenAndServe(":8080", nil))
 }
