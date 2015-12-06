@@ -78,5 +78,5 @@ func main() {
 		AddWriter(writeToDisk).
 		Start()
 
-	client.Serve(&camera)
+	client.Serve([]cam.Camera{camera})
 }

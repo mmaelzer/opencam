@@ -1,10 +1,6 @@
 package pipeline
 
-import (
-	"fmt"
-
-	"github.com/mmaelzer/cam"
-)
+import "github.com/mmaelzer/cam"
 
 type Block struct {
 	Camera *cam.Camera
@@ -71,7 +67,6 @@ func (p *Pipeline) AddTransform(t TransformFunc) *Pipeline {
 }
 
 func (p *Pipeline) writeFrames(frames chan Block) {
-	fmt.Println("write frames")
 	for f := range frames {
 		p.writer(f)
 	}

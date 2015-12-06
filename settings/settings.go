@@ -11,6 +11,7 @@ var s *viper.Viper
 func init() {
 	s = viper.New()
 	s.SetConfigType("json")
+	s.SetDefault("http.port", 8080)
 }
 
 func Load(r io.Reader) error {
@@ -23,4 +24,8 @@ func Get(key string) interface{} {
 
 func GetString(key string) string {
 	return s.GetString(key)
+}
+
+func GetInt(key string) int {
+	return s.GetInt(key)
 }
