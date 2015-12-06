@@ -4,3 +4,4 @@ supervisor/
 settings.json
 .DS_Store
 deploy.yml
+client/js/bundle.js
