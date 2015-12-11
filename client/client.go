@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -78,6 +79,7 @@ func stream(cameras []cam.Camera) http.HandlerFunc {
 				writer.Close()
 				return
 			}
+			log.Printf("[%s:%d] sending frame %d", frame.CameraName, frame.Number, len(frame.Bytes))
 			pw.Write(frame.Bytes)
 		}
 	}
@@ -103,6 +105,10 @@ func frame(cameras []cam.Camera) http.HandlerFunc {
 		w.Header().Set("Content-Length", strconv.Itoa(len(frame.Bytes)))
 		w.Write(frame.Bytes)
 	}
+}
+
+func config(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "client/config.html")
 }
 
 func blended(cameras []cam.Camera) http.HandlerFunc {
@@ -160,6 +166,7 @@ func Serve(cameras []cam.Camera) {
 	http.HandleFunc("/stream/", stream(cameras))
 	http.HandleFunc("/blended/", blended(cameras))
 	http.HandleFunc("/frame/", frame(cameras))
+	http.HandleFunc("/config", config)
 
 	port := settings.GetInt("http.port")
 	panic(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))

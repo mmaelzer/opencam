@@ -67,9 +67,11 @@ func main() {
 	handleFlags()
 
 	camera := cam.Camera{
+		Name:     settings.GetString("camera.name"),
 		URL:      settings.GetString("camera.url"),
 		Username: settings.GetString("camera.username"),
 		Password: settings.GetString("camera.password"),
+		Log:      true,
 	}
 
 	pipeline.New().
