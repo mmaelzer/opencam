@@ -169,5 +169,6 @@ func Serve(cameras []cam.Camera) {
 	http.HandleFunc("/config", config)
 
 	port := settings.GetInt("http.port")
+	log.Printf("http listening on %d", port)
 	panic(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }

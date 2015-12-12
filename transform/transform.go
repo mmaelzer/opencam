@@ -34,7 +34,7 @@ func (l *Lockit) set(lock bool) {
 func Motion() pipeline.TransformFunc {
 	return func(in chan pipeline.Block) chan pipeline.Block {
 		out := make(chan pipeline.Block)
-		readFrames(in, out)
+		go readFrames(in, out)
 		return out
 	}
 }
