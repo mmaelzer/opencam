@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"image/jpeg"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/mmaelzer/cam"
@@ -11,61 +12,79 @@ import (
 	"github.com/mmaelzer/opencam/pipeline"
 )
 
+type Lockit struct {
+	mutex    sync.Mutex
+	Unlocked bool
+}
+
+func (l *Lockit) Lock() {
+	l.set(false)
+}
+
+func (l *Lockit) Unlock() {
+	l.set(true)
+}
+
+func (l *Lockit) set(lock bool) {
+	l.mutex.Lock()
+	l.Unlocked = lock
+	l.mutex.Unlock()
+}
+
 func Motion() pipeline.TransformFunc {
-	return func(blocks chan pipeline.Block) chan pipeline.Block {
-		return readFrames(blocks)
+	return func(in chan pipeline.Block) chan pipeline.Block {
+		out := make(chan pipeline.Block)
+		readFrames(in, out)
+		return out
 	}
 }
 
-func readFrames(blocks chan pipeline.Block) chan pipeline.Block {
+func readFrames(in chan pipeline.Block, out chan pipeline.Block) {
+	var fellBehind uint64
+	lock := &Lockit{}
+	lock.Unlock()
+
 	fcache := make([]cam.Frame, 0)
-
 	lastTest := time.Now()
-	lastMotion := time.Now()
-	startMotion := time.Now()
-	inMotion := false
 
-	out := make(chan pipeline.Block)
-
-	var lastFrame cam.Frame
-	go func() {
-		for block := range blocks {
-			for _, frame := range block.Frames {
-				if len(fcache) > 0 && time.Since(lastTest) > time.Second*1 {
-					motion := testFrames(&lastFrame, &frame)
-					if motion {
-						lastMotion = time.Now()
-						if !inMotion {
-							log.Printf("Event begin %s", startMotion.Format("15_04_05"))
-							startMotion = time.Now()
-							inMotion = true
-						}
-					}
-
-					// log.Printf("time since last motion: %s", time.Since(lastMotion))
-					// log.Printf("cache size: %d\n", len(fcache))
-					if time.Since(lastMotion) < time.Second*4 {
-						out <- pipeline.Block{
-							Camera: block.Camera,
-							Frames: fcache,
-						}
-					} else {
-						if inMotion {
-							log.Printf("Event end. Duration: %s", time.Since(startMotion).String())
-						}
-
-						inMotion = false
-					}
-
-					fcache = make([]cam.Frame, 0)
-					lastTest = time.Now()
+	for block := range in {
+		for _, frame := range block.Frames {
+			fcache = append(fcache, frame)
+			if len(fcache) > 1 && time.Since(lastTest) > time.Second*2 {
+				if lock.Unlocked {
+					lock.Lock()
+					go processFrames(fcache, block.Camera, out, lock)
+				} else {
+					fellBehind++
+					log.Printf("Motion processing fell behind. Occurence %d", fellBehind)
 				}
-				fcache = append(fcache, frame)
-				lastFrame = frame
+
+				lastTest = time.Now()
+				fcache = make([]cam.Frame, 0)
 			}
 		}
-	}()
-	return out
+	}
+}
+
+func processFrames(frames []cam.Frame, camera *cam.Camera, out chan pipeline.Block, lock sync.Locker) {
+	firstFrame := frames[0]
+	lastFrame := frames[len(frames)-1]
+	motion := testFrames(&firstFrame, &lastFrame)
+
+	if motion {
+		log.Printf(
+			"Event found %s - %s",
+			firstFrame.Timestamp.Format(time.RFC3339),
+			lastFrame.Timestamp.Format(time.RFC3339),
+		)
+
+		out <- pipeline.Block{
+			Camera: camera,
+			Frames: frames,
+		}
+	}
+
+	lock.Unlock()
 }
 
 func testFrames(frame1, frame2 *cam.Frame) bool {
@@ -77,5 +96,5 @@ func testFrames(frame1, frame2 *cam.Frame) bool {
 	if err != nil {
 		return false
 	}
-	return camotion.MotionWithStep(jpg1, jpg2, 4, 2500, 10)
+	return camotion.MotionWithStep(jpg1, jpg2, 6, 2500, 10)
 }

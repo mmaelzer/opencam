@@ -11,13 +11,13 @@ type TransformFunc func(chan Block) chan Block
 
 type Pipeline struct {
 	transforms []TransformFunc
-	cameras    []cam.Camera
+	cameras    []*cam.Camera
 	writer     func(Block)
 }
 
 func New() *Pipeline {
 	transforms := make([]TransformFunc, 0)
-	cameras := make([]cam.Camera, 0)
+	cameras := make([]*cam.Camera, 0)
 	writer := func(frames Block) {}
 	return &Pipeline{
 		transforms: transforms,
@@ -27,7 +27,7 @@ func New() *Pipeline {
 }
 
 func (p *Pipeline) AddCamera(camera *cam.Camera) *Pipeline {
-	p.cameras = append(p.cameras, *camera)
+	p.cameras = append(p.cameras, camera)
 	return p
 }
 
@@ -40,7 +40,7 @@ func (p *Pipeline) Start() []error {
 	errors := make([]error, 0)
 	for i := 0; i < len(p.cameras); i++ {
 		c := p.cameras[i]
-		frames, err := initCamera(&c)
+		frames, err := initCamera(c)
 
 		if err != nil {
 			errors = append(errors, err)
