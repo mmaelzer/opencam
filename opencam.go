@@ -66,7 +66,7 @@ func main() {
 
 	handleFlags()
 
-	camera := cam.Camera{
+	camera := &cam.Camera{
 		Name:     settings.GetString("camera.name"),
 		URL:      settings.GetString("camera.url"),
 		Username: settings.GetString("camera.username"),
@@ -75,10 +75,10 @@ func main() {
 	}
 
 	pipeline.New().
-		AddCamera(&camera).
+		AddCamera(camera).
 		AddTransform(transform.Motion()).
 		AddWriter(writeToDisk).
 		Start()
 
-	client.Serve([]cam.Camera{camera})
+	client.Serve([]*cam.Camera{camera})
 }
