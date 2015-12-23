@@ -41,7 +41,7 @@ func stream(cameras []*cam.Camera) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("[%s] Opening HTTP stream to client")
+		log.Printf("[%s] Opening HTTP stream to client", camera.Name)
 
 		boundary := "gocamera"
 		w.Header().Set(
