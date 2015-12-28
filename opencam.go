@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"runtime/pprof"
@@ -52,7 +53,9 @@ func writeToDisk(block pipeline.Block) {
 	}
 
 	ff := block.Frames[0]
-	name := ff.Timestamp.Format("15_04_05")
+	lf := block.Frames[len(block.Frames)-1]
+	duration := lf.Timestamp.Unix() - ff.Timestamp.Unix()
+	name := fmt.Sprintf("%s-%d", ff.Timestamp.Format("15_04_05"), duration)
 	out := settings.GetString("output")
 
 	for _, frame := range block.Frames {
@@ -77,7 +80,8 @@ func main() {
 
 	pipeline.New().
 		AddCamera(camera).
-		AddTransform(transform.Motion()).
+		Pipe(transform.Motion()).
+		Pipe(transform.Batch(time.Second*4, time.Second*30)).
 		AddWriter(writeToDisk).
 		Start()
 

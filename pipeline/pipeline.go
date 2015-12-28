@@ -7,22 +7,22 @@ type Block struct {
 	Frames []cam.Frame
 }
 
-type TransformFunc func(chan Block) chan Block
+type StreamFunc func(chan Block) chan Block
 
 type Pipeline struct {
-	transforms []TransformFunc
-	cameras    []*cam.Camera
-	writer     func(Block)
+	streams []StreamFunc
+	cameras []*cam.Camera
+	writer  func(Block)
 }
 
 func New() *Pipeline {
-	transforms := make([]TransformFunc, 0)
+	streams := make([]StreamFunc, 0)
 	cameras := make([]*cam.Camera, 0)
 	writer := func(frames Block) {}
 	return &Pipeline{
-		transforms: transforms,
-		cameras:    cameras,
-		writer:     writer,
+		streams: streams,
+		cameras: cameras,
+		writer:  writer,
 	}
 }
 
@@ -47,8 +47,8 @@ func (p *Pipeline) Start() []error {
 			continue
 		}
 
-		for j := 0; j < len(p.transforms); j++ {
-			frames = p.transforms[j](frames)
+		for j := 0; j < len(p.streams); j++ {
+			frames = p.streams[j](frames)
 		}
 
 		go p.writeFrames(frames)
@@ -61,8 +61,8 @@ func (p *Pipeline) Start() []error {
 	}
 }
 
-func (p *Pipeline) AddTransform(t TransformFunc) *Pipeline {
-	p.transforms = append(p.transforms, t)
+func (p *Pipeline) Pipe(t StreamFunc) *Pipeline {
+	p.streams = append(p.streams, t)
 	return p
 }
 

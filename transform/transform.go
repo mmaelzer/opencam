@@ -31,7 +31,7 @@ func (l *Lockit) set(lock bool) {
 	l.mutex.Unlock()
 }
 
-func Motion() pipeline.TransformFunc {
+func Motion() pipeline.StreamFunc {
 	return func(in chan pipeline.Block) chan pipeline.Block {
 		out := make(chan pipeline.Block)
 		go readFrames(in, out)
@@ -44,24 +44,23 @@ func readFrames(in chan pipeline.Block, out chan pipeline.Block) {
 	lock := &Lockit{}
 	lock.Unlock()
 
-	fcache := make([]cam.Frame, 0)
+	fcache := make(map[*cam.Camera][]cam.Frame)
 	lastTest := time.Now()
 
 	for block := range in {
-		for _, frame := range block.Frames {
-			fcache = append(fcache, frame)
-			if len(fcache) > 1 && time.Since(lastTest) > time.Second*2 {
-				if lock.Unlocked {
-					lock.Lock()
-					go processFrames(fcache, block.Camera, out, lock)
-				} else {
-					fellBehind++
-					log.Printf("Motion processing fell behind. Occurence %d", fellBehind)
-				}
-
-				lastTest = time.Now()
-				fcache = make([]cam.Frame, 0)
+		cameraFrames := fcache[block.Camera]
+		cameraFrames = append(cameraFrames, block.Frames...)
+		fcache[block.Camera] = cameraFrames
+		if len(cameraFrames) > 1 && time.Since(lastTest) > time.Second*2 {
+			if lock.Unlocked {
+				lock.Lock()
+				go processFrames(cameraFrames, block.Camera, out, lock)
+			} else {
+				fellBehind++
+				log.Printf("Motion processing fell behind. Occurence %d", fellBehind)
 			}
+			lastTest = time.Now()
+			fcache[block.Camera] = make([]cam.Frame, 0)
 		}
 	}
 }
