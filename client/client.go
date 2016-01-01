@@ -14,10 +14,11 @@ import (
 
 	"github.com/mmaelzer/cam"
 	"github.com/mmaelzer/camotion"
+	"github.com/mmaelzer/opencam/pipeline"
 	"github.com/mmaelzer/opencam/settings"
 )
 
-func getCamera(cameras []*cam.Camera, w http.ResponseWriter, r *http.Request) *cam.Camera {
+func getCamera(cameras []*pipeline.Camera, w http.ResponseWriter, r *http.Request) *pipeline.Camera {
 	cIDStr := path.Base(r.URL.Path)
 	cID, err := strconv.Atoi(cIDStr)
 
@@ -34,7 +35,7 @@ func getCamera(cameras []*cam.Camera, w http.ResponseWriter, r *http.Request) *c
 	return cameras[cID]
 }
 
-func stream(cameras []*cam.Camera) http.HandlerFunc {
+func stream(cameras []*pipeline.Camera) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		camera := getCamera(cameras, w, r)
 		if camera == nil {
@@ -87,7 +88,7 @@ func stream(cameras []*cam.Camera) http.HandlerFunc {
 	}
 }
 
-func frame(cameras []*cam.Camera) http.HandlerFunc {
+func frame(cameras []*pipeline.Camera) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		camera := getCamera(cameras, w, r)
 		if camera == nil {
@@ -113,7 +114,7 @@ func config(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "client/config.html")
 }
 
-func blended(cameras []*cam.Camera) http.HandlerFunc {
+func blended(cameras []*pipeline.Camera) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		camera := getCamera(cameras, w, r)
 		if camera == nil {
@@ -157,7 +158,7 @@ func getBlendedImage(frame1, frame2 *cam.Frame) image.Image {
 	return camotion.Blended(jpg1, jpg2, 2500)
 }
 
-func Serve(cameras []*cam.Camera) {
+func Serve(cameras []*pipeline.Camera) {
 	static := http.FileServer(http.Dir("client/"))
 	http.Handle("/", static)
 

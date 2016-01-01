@@ -16,9 +16,9 @@ func Batch(wait, max time.Duration) pipeline.StreamFunc {
 }
 
 func batchBlocks(wait, max time.Duration, in, out chan pipeline.Block) {
-	frames := make(map[*cam.Camera][]cam.Frame)
-	ticks := make(map[*cam.Camera]time.Time)
-	starts := make(map[*cam.Camera]time.Time)
+	frames := make(map[*pipeline.Camera][]cam.Frame)
+	ticks := make(map[*pipeline.Camera]time.Time)
+	starts := make(map[*pipeline.Camera]time.Time)
 
 	go func() {
 		for {

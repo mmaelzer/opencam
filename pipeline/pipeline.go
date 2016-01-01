@@ -3,42 +3,58 @@ package pipeline
 import "github.com/mmaelzer/cam"
 
 type Block struct {
-	Camera *cam.Camera
+	Camera *Camera
 	Frames []cam.Frame
 }
 
 type StreamFunc func(chan Block) chan Block
+type WriterFunc func(Block)
+
+type Camera struct {
+	ID uint64 `json:"id"`
+	cam.Camera
+}
 
 type Pipeline struct {
 	streams []StreamFunc
-	cameras []*cam.Camera
-	writer  func(Block)
+	cameras []*Camera
+	writers []WriterFunc
 }
 
 func New() *Pipeline {
-	streams := make([]StreamFunc, 0)
-	cameras := make([]*cam.Camera, 0)
-	writer := func(frames Block) {}
-	return &Pipeline{
-		streams: streams,
-		cameras: cameras,
-		writer:  writer,
-	}
+	p := &Pipeline{}
+	return p.init()
 }
 
-func (p *Pipeline) AddCamera(camera *cam.Camera) *Pipeline {
+func (p *Pipeline) Cameras() []*Camera {
+	return p.cameras
+}
+
+func (p *Pipeline) init() *Pipeline {
+	p.streams = make([]StreamFunc, 0)
+	p.cameras = make([]*Camera, 0)
+	p.writers = make([]WriterFunc, 0)
+	return p
+}
+
+func (p *Pipeline) AddCamera(camera *Camera) *Pipeline {
 	p.cameras = append(p.cameras, camera)
 	return p
 }
 
-func (p *Pipeline) AddWriter(w func(Block)) *Pipeline {
-	p.writer = w
+func (p *Pipeline) AddCameras(cameras []*Camera) *Pipeline {
+	p.cameras = append(p.cameras, cameras...)
+	return p
+}
+
+func (p *Pipeline) AddWriter(w WriterFunc) *Pipeline {
+	p.writers = append(p.writers, w)
 	return p
 }
 
 func (p *Pipeline) Start() []error {
 	errors := make([]error, 0)
-	for i := 0; i < len(p.cameras); i++ {
+	for i := range p.cameras {
 		c := p.cameras[i]
 		frames, err := initCamera(c)
 
@@ -61,6 +77,13 @@ func (p *Pipeline) Start() []error {
 	}
 }
 
+func (p *Pipeline) Stop() {
+	for i := range p.cameras {
+		p.cameras[i].Stop()
+	}
+	p.init()
+}
+
 func (p *Pipeline) Pipe(t StreamFunc) *Pipeline {
 	p.streams = append(p.streams, t)
 	return p
@@ -68,11 +91,13 @@ func (p *Pipeline) Pipe(t StreamFunc) *Pipeline {
 
 func (p *Pipeline) writeFrames(frames chan Block) {
 	for f := range frames {
-		p.writer(f)
+		for _, w := range p.writers {
+			w(f)
+		}
 	}
 }
 
-func initCamera(camera *cam.Camera) (chan Block, error) {
+func initCamera(camera *Camera) (chan Block, error) {
 	frames, err := camera.Subscribe()
 	if err != nil {
 		return nil, err
