@@ -6,6 +6,25 @@ export function mapStep (arr, count, fn) {
   return results
 }
 
+export function captureErr (fn) {
+  return function (err, var_args) {
+    if (err) return console.error(err)
+    fn.call(this, ...slice(arguments, 1))
+  }
+}
+
+export function partial (fn, var_args) {
+  const args = slice(arguments, 1)
+  return function () {
+    return fn.call(this, ...args)
+  }
+}
+
+export function after (times, fn) {
+  let calls = 0
+  return () => { if (++calls === times) fn() }
+}
+
 export function each (arr, fn) {
   return Array.prototype.forEach.call(arr, fn)
 }
@@ -20,6 +39,10 @@ export function last (arr) {
 
 export function split (str, del) {
   return String.prototype.split.call(str, del)
+}
+
+export function slice (arr, start, end) {
+  return Array.prototype.slice.call(arr, start, end)
 }
 
 export function map (arr, fn) {
