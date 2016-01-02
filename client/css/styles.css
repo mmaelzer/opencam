@@ -1,0 +1,23 @@
+.event {
+  margin: 10px 0;
+}
+
+.event a {
+  display: block;
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-shadow: 0 0 30px -10px #666;
+  color: #333;
+}
+
+.event a:hover {
+  text-decoration: none;
+}
+
+.event-info {
+  margin-top: 10px;
+}
+
+.event-image-container img {
+  width: 100%;
+}

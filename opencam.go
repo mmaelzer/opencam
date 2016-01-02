@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/mmaelzer/opencam/client"
+	"github.com/mmaelzer/opencam/model/migrations"
 	"github.com/mmaelzer/opencam/pipeline/manager"
 	"github.com/mmaelzer/opencam/settings"
 	"github.com/mmaelzer/opencam/store"
-	"github.com/mmaelzer/opencam/store/migrations"
 )
 
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -45,6 +45,7 @@ func handleFlags() {
 		}
 	}
 
+	settings.Set("sqldURL", *sqldURL)
 	store.Initialize(*sqldURL)
 	if err := migrations.Migrate("sqlite3"); err != nil {
 		log.Fatal(`Problems connecting to a sqld instance.

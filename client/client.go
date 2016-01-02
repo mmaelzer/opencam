@@ -2,21 +2,67 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/http/httputil"
 	"net/textproto"
+	"net/url"
 	"path"
 	"strconv"
+	"time"
 
 	"github.com/mmaelzer/cam"
 	"github.com/mmaelzer/camotion"
 	"github.com/mmaelzer/opencam/pipeline"
 	"github.com/mmaelzer/opencam/settings"
+	"github.com/mmaelzer/opencam/store"
 )
+
+type TransparentResponseWriter struct {
+	Status int
+	Writer http.ResponseWriter
+	Size   int
+}
+
+func (t *TransparentResponseWriter) Write(b []byte) (int, error) {
+	size, err := t.Writer.Write(b)
+	t.Size = size
+	return size, err
+}
+
+func (t *TransparentResponseWriter) Header() http.Header {
+	return t.Writer.Header()
+}
+
+func (t *TransparentResponseWriter) WriteHeader(code int) {
+	t.Status = code
+	t.Writer.WriteHeader(code)
+}
+
+func sendImage(w http.ResponseWriter, image []byte) {
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", strconv.Itoa(len(image)))
+	w.WriteHeader(http.StatusOK)
+	w.Write(image)
+}
+
+func sendJSON(w http.ResponseWriter, i interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(i)
+}
+
+func sendText(w http.ResponseWriter, code int, message string) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(code)
+	w.Write([]byte(message))
+}
 
 func getCamera(cameras []*pipeline.Camera, w http.ResponseWriter, r *http.Request) *pipeline.Camera {
 	cIDStr := path.Base(r.URL.Path)
@@ -103,10 +149,7 @@ func frame(cameras []*pipeline.Camera) http.HandlerFunc {
 
 		defer camera.Unsubscribe(frames)
 		frame := <-frames
-
-		w.Header().Set("Content-Type", "image/jpeg")
-		w.Header().Set("Content-Length", strconv.Itoa(len(frame.Bytes)))
-		w.Write(frame.Bytes)
+		sendImage(w, frame.Bytes)
 	}
 }
 
@@ -140,9 +183,7 @@ func blended(cameras []*pipeline.Camera) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "image/jpeg")
-		w.Header().Set("Content-Length", strconv.Itoa(len(b.Bytes())))
-		w.Write(b.Bytes())
+		sendImage(w, b.Bytes())
 	}
 }
 
@@ -158,6 +199,64 @@ func getBlendedImage(frame1, frame2 *cam.Frame) image.Image {
 	return camotion.Blended(jpg1, jpg2, 2500)
 }
 
+func event(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Path[len("/api/event/"):]
+	ev, err := store.GetEvent(id)
+	if err != nil {
+		sendText(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	if ev.ID == 0 {
+		sendText(w, http.StatusNotFound, "Not Found")
+		return
+	}
+	base := settings.GetString("output")
+	dir := path.Join(base, ev.Filepath)
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		sendText(w, http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	frames := make([]string, 0)
+	for i := range files {
+		if files[i].IsDir() {
+			continue
+		}
+		frames = append(frames, path.Join("/video", ev.Filepath, files[i].Name()))
+	}
+	ev.Frames = frames
+	sendJSON(w, ev)
+}
+
+func l(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		t := &TransparentResponseWriter{Writer: w}
+		fn(t, r)
+		log.Printf("%s %d %s %s %d", r.Method, t.Status, r.URL.String(), time.Since(start), t.Size)
+	}
+}
+
+func events() http.HandlerFunc {
+	sqldURL, err := url.Parse(settings.GetString("sqldURL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sqldURL.Path = path.Join(sqldURL.Path, "/event")
+	proxy := httputil.ReverseProxy{
+		Director: func(r *http.Request) {
+			r.URL = sqldURL
+		},
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		t := &TransparentResponseWriter{Writer: w}
+		proxy.ServeHTTP(t, r)
+	}
+}
+
 func Serve(cameras []*pipeline.Camera) {
 	static := http.FileServer(http.Dir("client/"))
 	http.Handle("/", static)
@@ -165,11 +264,12 @@ func Serve(cameras []*pipeline.Camera) {
 	vpath := settings.GetString("output")
 	videos := http.FileServer(http.Dir(vpath))
 	http.Handle("/video/", http.StripPrefix("/video/", videos))
-
+	http.HandleFunc("/api/event/", l(event))
+	http.HandleFunc("/api/events", l(events()))
 	http.HandleFunc("/stream/", stream(cameras))
-	http.HandleFunc("/blended/", blended(cameras))
-	http.HandleFunc("/frame/", frame(cameras))
-	http.HandleFunc("/config", config)
+	http.HandleFunc("/blended/", l(blended(cameras)))
+	http.HandleFunc("/frame/", l(frame(cameras)))
+	http.HandleFunc("/config", l(config))
 
 	port := settings.GetInt("http.port")
 	log.Printf("http listening on %d", port)

@@ -25,13 +25,13 @@ func Writer(block pipeline.Block) {
 	event := map[string]interface{}{
 		"camera_id":   block.Camera.ID,
 		"type":        "motion",
-		"start":       ff.Timestamp.Format(time.RFC3339),
-		"end":         lf.Timestamp.Format(time.RFC3339),
+		"start_time":  ff.Timestamp.Format(time.RFC3339),
+		"end_time":    lf.Timestamp.Format(time.RFC3339),
 		"duration":    duration,
 		"filepath":    folder,
 		"first_frame": firstImage,
 		"last_frame":  lastImage,
-		"frames":      len(block.Frames),
+		"frame_count": len(block.Frames),
 	}
 
 	log.Printf("Saving event: %v", event)

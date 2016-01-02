@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/mmaelzer/cam"
+	"github.com/mmaelzer/opencam/model"
 	"github.com/mmaelzer/opencam/pipeline"
 	"github.com/mmaelzer/opencam/settings"
 )
@@ -60,6 +61,17 @@ func SaveImageFile(data []byte, folder, filename string) error {
 
 func Get(name string, i interface{}) error {
 	return get(fmt.Sprintf("%s/%s", sqldURL, name), i)
+}
+
+func GetEvent(id string) (*model.Event, error) {
+	var events []model.Event
+	if err := get(fmt.Sprintf("%s/event/%s", sqldURL, id), &events); err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return &model.Event{}, nil
+	}
+	return &events[0], nil
 }
 
 func GetID(name string, id string, i interface{}) error {

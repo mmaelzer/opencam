@@ -26,6 +26,10 @@ func GetString(key string) string {
 	return s.GetString(key)
 }
 
+func Set(key string, val interface{}) {
+	s.Set(key, val)
+}
+
 func GetInt(key string) int {
 	return s.GetInt(key)
 }

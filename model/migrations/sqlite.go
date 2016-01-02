@@ -20,16 +20,16 @@ var create_tables string = `
 		id INTEGER PRIMARY KEY,
 		camera_id INTEGER,
 		type VARCHAR(32),
-		start DATETIME,
-		end DATETIME,
+		start_time DATETIME,
+		end_time DATETIME,
 		duration INTEGER,
 		filepath VARCHAR(1024),
 		first_frame VARCHAR(1024),
 		last_frame VARCHAR(1024),
-		frames INTEGER
+		frame_count INTEGER
 	);
 
-	CREATE INDEX IF NOT EXISTS cam_start_end_duration ON event(camera_id, start, end, duration);
+	CREATE INDEX IF NOT EXISTS cam_start_end_duration ON event(camera_id, start_time, end_time, duration);
 
 	CREATE TABLE IF NOT EXISTS setting (
 		id INTEGER PRIMARY KEY,

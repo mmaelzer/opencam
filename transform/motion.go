@@ -76,5 +76,5 @@ func testFrames(frame1, frame2 *cam.Frame) bool {
 	if err != nil {
 		return false
 	}
-	return camotion.MotionWithStep(jpg1, jpg2, 1, 2500, 10)
+	return camotion.MotionWithStep(jpg1, jpg2, 10, 2500, 10)
 }
