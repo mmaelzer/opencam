@@ -106,8 +106,5 @@ function renderEvents (events) {
 }
 
 (function main () {
-  getEvents(1, (err, events) => {
-    if (err) return console.error(err)
-    renderEvents(events)
-  })
+  getEvents(1, captureErr(renderEvents))
 })()

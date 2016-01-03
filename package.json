@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "browserify client/js/pages/events.js -t babelify --outfile client/js/events.js",
-    "watch": "reflex -g 'client/js/**/*.js' -R 'bundle.js' -R 'client/js/event.js' -R '^node_modules/' -- npm run build"
+    "debug": "browserify client/js/pages/events.js -d -t babelify --outfile client/js/events.js",
+    "watch": "reflex -g 'client/js/**/*.js' -R 'bundle.js' -R 'client/js/event.js' -R '^node_modules/' -- npm run debug"
   },
   "author": "",
   "license": "ISC",
