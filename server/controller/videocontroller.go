@@ -25,12 +25,15 @@ func getCamera(cameras []*pipeline.Camera, w http.ResponseWriter, r *http.Reques
 		return nil
 	}
 
-	if cID > len(cameras) {
-		http.NotFound(w, r)
-		return nil
+	id := uint64(cID)
+	for i := range cameras {
+		if cameras[i].ID == id {
+			return cameras[i]
+		}
 	}
 
-	return cameras[cID]
+	http.NotFound(w, r)
+	return nil
 }
 
 func Stream(cameras []*pipeline.Camera) http.HandlerFunc {

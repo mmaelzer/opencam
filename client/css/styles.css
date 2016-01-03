@@ -27,3 +27,32 @@
   height: 4px;
   background-color: #3F9FFF;
 }
+
+.stream img {
+  width: 100%;
+}
+
+.stream-container {
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-shadow: 0 0 30px -10px #666;
+  color: #333;
+  margin: 10px 0;
+}
+
+.stream-info {
+  font-size: 24px;
+}
+
+#nav {
+  margin: 10px 15px;
+}
+
+#nav a {
+  padding: 10px;
+  font-size: 20px;
+  display: inline-block;
+    color: #fff;
+    background: #0288D1;
+    border: 1px solid #337ab7;
+}

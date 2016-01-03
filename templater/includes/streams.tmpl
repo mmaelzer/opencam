@@ -1,0 +1,12 @@
+{{ define "streams" }}
+  <div class="row">
+  {{ range . }}
+    <div class="stream col-lg-4 col-md-6 col-sm-12" data-id="{{.ID}}">
+      <div class="stream-container">
+        <img src="/stream/{{.ID}}">
+        <div class="stream-info">{{.Name}}</div>
+      </div>
+    </div>
+  {{ end }}
+  </div>
+{{ end }}

@@ -1,0 +1,10 @@
+{{ define "title" }}opencam{{ end }}
+{{ define "content" }}
+  <div id="opencam">
+    <div id="live" class="container-fluid">
+      {{ template "streams" . }} 
+    </div>
+  </div>
+{{ end }}
+{{ define "scripts" }}
+{{ end }}
