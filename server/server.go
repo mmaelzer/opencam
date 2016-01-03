@@ -25,12 +25,13 @@ func logHandler(h http.Handler) http.HandlerFunc {
 }
 
 func Serve(cameras []*pipeline.Camera) {
-	static := http.FileServer(http.Dir("client/"))
-	http.Handle("/", static)
-
+	static := http.StripPrefix("/static/", http.FileServer(http.Dir("client/")))
 	vpath := settings.GetString("output")
-	videos := http.FileServer(http.Dir(vpath))
-	http.HandleFunc("/video/", logHandler(http.StripPrefix("/video/", videos)))
+	videos := http.StripPrefix("/video/", http.FileServer(http.Dir(vpath)))
+
+	http.HandleFunc("/", logHandler(controller.Main()))
+	http.HandleFunc("/static/", logHandler(static))
+	http.HandleFunc("/video/", logHandler(videos))
 	http.HandleFunc("/api/event/", logHandler(controller.Event()))
 	http.HandleFunc("/api/events", logHandler(controller.Events()))
 	http.HandleFunc("/stream/", logHandler(controller.Stream(cameras)))

@@ -6,6 +6,13 @@ import (
 	"strconv"
 )
 
+func sendHTML(w http.ResponseWriter, html []byte) {
+	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Length", strconv.Itoa(len(html)))
+	w.WriteHeader(http.StatusOK)
+	w.Write(html)
+}
+
 func sendImage(w http.ResponseWriter, image []byte) {
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(len(image)))
