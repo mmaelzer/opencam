@@ -51,12 +51,16 @@ function play (frames, div) {
     while (div.hasChildNodes()) {
       div.removeChild(div.lastChild)
     }
+    const progress = first(
+      div.parentElement.getElementsByClassName('event-video-progress')
+    )
+    progress.style.width = '0%'
     function loadFrame (i) {
       if (i === frames.length) return
       if (i > 0) div.removeChild(frames[i - 1])
       div.appendChild(frames[i])
+      progress.style.width = ((100 * (i + 1)) / frames.length) + '%'
       const timeout = getTimeout(frames[i], frames[i + 1])
-      console.log(timeout)
       window.setTimeout(partial(loadFrame, i + 1), timeout)
     }
     loadFrame(0)

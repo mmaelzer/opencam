@@ -8,6 +8,7 @@ export default function (event) {
         <div class="event-image-container">
           <img class="event-image" src="/video/${event.first_frame}">
         </div>
+        <div class="event-video-progress"></div>
         <div class="event-info">
           ${time}<br>
           ${event.duration}s<br>

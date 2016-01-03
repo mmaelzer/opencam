@@ -21,3 +21,9 @@
 .event-image-container img {
   width: 100%;
 }
+
+.event-video-progress {
+  width: 0;
+  height: 4px;
+  background-color: #3F9FFF;
+}
