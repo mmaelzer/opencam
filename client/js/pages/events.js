@@ -73,7 +73,14 @@ function play (eventId, frames, div) {
 function playEvent (el) {
   return function (event) {
     let imgContainer = first(el.getElementsByClassName('event-image-container'))
-    window.clearTimeout(players[event.id])
+    // If playing, stop the player
+    if (event.id in players) {
+      window.clearTimeout(players[event.id])
+      delete players[event.id]
+      return
+    }
+    // If images cached, used cached images instead of
+    // fetching new images from the server
     if (event.id in images) {
       play(event.id, images[event.id], imgContainer)
       return
