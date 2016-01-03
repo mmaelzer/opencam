@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"path"
+	"strconv"
 
 	"github.com/mmaelzer/opencam/settings"
 	"github.com/mmaelzer/opencam/store"
@@ -53,7 +55,18 @@ func Events() http.HandlerFunc {
 	sqldURL.Path = path.Join(sqldURL.Path, "/event")
 	proxy := httputil.ReverseProxy{
 		Director: func(r *http.Request) {
+			query := r.URL.Query()
 			r.URL = sqldURL
+			if page, ok := query["page"]; ok {
+				query.Add("__limit__", "100")
+				pageNum, err := strconv.Atoi(page[0])
+				if err == nil {
+					query.Add("__offset__", fmt.Sprintf("%d", 100*(pageNum-1)))
+				}
+				query.Del("page")
+			}
+			query.Add("__order_by__", "id DESC")
+			r.URL.RawQuery = query.Encode()
 		},
 	}
 
