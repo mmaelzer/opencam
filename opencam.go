@@ -7,9 +7,9 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/mmaelzer/opencam/client"
 	"github.com/mmaelzer/opencam/model/migrations"
 	"github.com/mmaelzer/opencam/pipeline/manager"
+	"github.com/mmaelzer/opencam/server"
 	"github.com/mmaelzer/opencam/settings"
 	"github.com/mmaelzer/opencam/store"
 )
@@ -59,5 +59,5 @@ func main() {
 
 	handleFlags()
 	manager.Start()
-	client.Serve(manager.Cameras())
+	server.Serve(manager.Cameras())
 }
