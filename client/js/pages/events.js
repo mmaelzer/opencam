@@ -16,6 +16,8 @@ import {
 superagentJson(superagent)
 
 const request = superagent
+const players = {}
+const images = {}
 
 function getTimeout (image1, image2) {
   if (typeof image1 === 'undefined' || typeof image2 === 'undefined') {
@@ -46,33 +48,42 @@ function buildImageForFrame (frame) {
   return image
 }
 
-function play (frames, div) {
-  return function () {
-    while (div.hasChildNodes()) {
-      div.removeChild(div.lastChild)
-    }
-    const progress = first(
-      div.parentElement.getElementsByClassName('event-video-progress')
-    )
-    progress.style.width = '0%'
-    function loadFrame (i) {
-      if (i === frames.length) return
-      if (i > 0) div.removeChild(frames[i - 1])
-      div.appendChild(frames[i])
-      progress.style.width = ((100 * (i + 1)) / frames.length) + '%'
-      const timeout = getTimeout(frames[i], frames[i + 1])
-      window.setTimeout(partial(loadFrame, i + 1), timeout)
-    }
-    loadFrame(0)
+function play (eventId, frames, div) {
+  while (div.hasChildNodes()) {
+    div.removeChild(div.lastChild)
   }
+  const progress = first(
+    div.parentElement.getElementsByClassName('event-video-progress')
+  )
+  progress.style.width = '0%'
+  function loadFrame (i) {
+    if (i === frames.length) {
+      delete players[eventId]
+      return
+    }
+    if (i > 0) div.removeChild(frames[i - 1])
+    div.appendChild(frames[i])
+    progress.style.width = ((100 * (i + 1)) / frames.length) + '%'
+    const timeout = getTimeout(frames[i], frames[i + 1])
+    players[eventId] = window.setTimeout(partial(loadFrame, i + 1), timeout)
+  }
+  loadFrame(0)
 }
 
 function playEvent (el) {
   return function (event) {
     let imgContainer = first(el.getElementsByClassName('event-image-container'))
+    window.clearTimeout(players[event.id])
+    if (event.id in images) {
+      play(event.id, images[event.id], imgContainer)
+      return
+    }
     let frames = map(event.frames, buildImageForFrame)
-    let playWhenReady = after(frames.length, play(frames, imgContainer))
-    each(frames, frame => frame.onload = playWhenReady)
+    let loaded = after(frames.length, () => {
+      images[event.id] = frames
+      play(event.id, frames, imgContainer)
+    })
+    each(frames, frame => frame.onload = loaded)
   }
 }
 
