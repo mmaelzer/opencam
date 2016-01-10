@@ -11,8 +11,7 @@
     </head>
     <body>
         <div id="nav">
-          <a href="/">Live</a> 
-          <a href="/events">Events</a>
+          {{ template "nav" . }}
         </div>
         {{ template "content" . }}
         {{ template "scripts" . }}

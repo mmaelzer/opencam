@@ -58,8 +58,12 @@ export function reduce (arr, fn, base) {
   return Array.prototype.reduce.call(arr, fn, base)
 }
 
+export function array (arr) {
+  return Array.isArray(arr) ? arr : [arr]
+}
+
 export function flatten (arr) {
   return reduce(arr, i => {
-    return Array.isArray(i) ? i.concat(i) : i
+    return arr.concat(array(i))
   }, [])
 }
