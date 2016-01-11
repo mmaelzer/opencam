@@ -9,5 +9,6 @@
   </div>
 {{ end }}
 {{ define "scripts" }}
+  <script>OPENCAM_CAMERAS = {{ json .Cameras }}</script>
   <script src="/static/js/events.js"></script>
 {{ end }}

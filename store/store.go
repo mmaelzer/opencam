@@ -18,9 +18,24 @@ import (
 )
 
 var sqldURL string
+var cameraCache map[int]model.Camera
 
 func Initialize(url string) {
 	sqldURL = strings.TrimSuffix(url, "/")
+	cacheCameras()
+}
+
+func cacheCameras() {
+	var cameras []model.Camera
+	err := Get("camera", &cameras)
+	if err != nil {
+		log.Printf("Unable to cache cameras: %s", err.Error())
+		return
+	}
+	cameraCache = make(map[int]model.Camera, len(cameras))
+	for i := range cameras {
+		cameraCache[cameras[i].ID] = cameras[i]
+	}
 }
 
 func FolderForBlock(block pipeline.Block) string {
@@ -61,6 +76,14 @@ func SaveImageFile(data []byte, folder, filename string) error {
 
 func Get(name string, i interface{}) error {
 	return get(fmt.Sprintf("%s/%s", sqldURL, name), i)
+}
+
+func GetCameras() []model.Camera {
+	cameras := make([]model.Camera, 0)
+	for _, camera := range cameraCache {
+		cameras = append(cameras, camera)
+	}
+	return cameras
 }
 
 func GetEvent(id string) (*model.Event, error) {

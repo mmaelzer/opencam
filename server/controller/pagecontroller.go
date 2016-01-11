@@ -10,12 +10,22 @@ import (
 
 func EventPage() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		html, err := templater.Build("events", nil)
+		cameras := store.GetCameras()
+		html, err := templater.Build("events", struct {
+			Cameras []model.Camera
+		}{
+			cameras,
+		})
 		if err != nil {
-			sendText(w, http.StatusInternalServerError, "Unable to render page")
+			unableToRender(w)
+		} else {
+			sendHTML(w, html)
 		}
-		sendHTML(w, html)
 	}
+}
+
+func unableToRender(w http.ResponseWriter) {
+	sendText(w, http.StatusInternalServerError, "Unable to render page")
 }
 
 func LivePage() http.HandlerFunc {
@@ -24,8 +34,9 @@ func LivePage() http.HandlerFunc {
 		err := store.Get("camera", &cameras)
 		html, err := templater.Build("live", cameras)
 		if err != nil {
-			sendText(w, http.StatusInternalServerError, "Unable to render page")
+			unableToRender(w)
+		} else {
+			sendHTML(w, html)
 		}
-		sendHTML(w, html)
 	}
 }

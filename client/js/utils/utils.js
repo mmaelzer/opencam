@@ -13,9 +13,17 @@ export function captureErr (fn) {
   }
 }
 
+export function _ () {}
+
 export function partial (fn, var_args) {
   const args = slice(arguments, 1)
   return function () {
+    let internalArgs = slice(arguments)
+    for (let i = 0; i < args.length; i++) {
+      if (args[i] === _) {
+        args[i] = internalArgs.shift()
+      }
+    }
     return fn.call(this, ...args)
   }
 }
@@ -27,6 +35,27 @@ export function after (times, fn) {
 
 export function each (arr, fn) {
   return Array.prototype.forEach.call(arr, fn)
+}
+
+export function findWhere (arr, predicate) {
+  return first(filter(arr, (item) => {
+    let keys = Object.keys(predicate)
+    let found = true
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i]
+      found = found && item[key] === predicate[key]
+      if (!found) return false
+    }
+    return found
+  }))
+}
+
+export function find (arr, fn) {
+  return first(filter(arr, fn))
+}
+
+export function filter (arr, fn) {
+  return Array.prototype.filter.call(arr, fn)
 }
 
 export function first (arr) {

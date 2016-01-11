@@ -2,6 +2,7 @@ package templater
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"path/filepath"
@@ -18,6 +19,10 @@ func init() {
 	helpers := template.FuncMap{
 		"humanizeDate":   humanize.Time,
 		"humanizeNumber": humanize.Comma,
+		"json": func(v interface{}) template.JS {
+			j, _ := json.Marshal(v)
+			return template.JS(j)
+		},
 	}
 
 	templates = make(map[string]*template.Template)

@@ -3,6 +3,7 @@ import superagentJson from 'superagent-jsonapify'
 import eventTemplate from '../templates/event'
 import rowTemplate from '../templates/row'
 import {
+  _,
   after,
   captureErr,
   each,
@@ -106,8 +107,11 @@ function buildEventEl (el) {
 }
 
 function renderEvents (events) {
+  const cameras = window.OPENCAM_CAMERAS
   const eventsDiv = document.getElementById('events')
-  eventsDiv.innerHTML = rowTemplate(join(map(events, eventTemplate)))
+  eventsDiv.innerHTML = rowTemplate(
+    join(map(events, partial(eventTemplate, _, cameras)))
+  )
   const eventsEl = document.getElementsByClassName('event')
   return map(eventsEl, buildEventEl)
 }

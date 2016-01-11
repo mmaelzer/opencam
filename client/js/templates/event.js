@@ -1,7 +1,9 @@
 import moment from 'moment'
+import { findWhere } from '../utils/utils'
 
-export default function (event) {
+export default function (event, cameras) {
   const time = moment(event.start_time).format('hh:mm:ssa MM/DD/YYYY')
+  const camera = findWhere(cameras, { id: event.camera_id })
   return `
     <div class="event col-lg-3 col-md-4 col-sm-6" data-id="${event.id}">
       <a href="/event/${event.id}">
@@ -10,6 +12,7 @@ export default function (event) {
         </div>
         <div class="event-video-progress"></div>
         <div class="event-info">
+          <h3>${camera.name}</h3>
           ${time}<br>
           ${event.duration}s<br>
         </div>

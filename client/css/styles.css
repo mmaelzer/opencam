@@ -18,6 +18,10 @@
   margin-top: 10px;
 }
 
+.event-info h3 {
+    margin: 0 0 10px;
+}
+
 .event-image-container img {
   width: 100%;
 }
