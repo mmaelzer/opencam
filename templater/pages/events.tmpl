@@ -1,14 +1,10 @@
 {{ define "title" }}opencam{{ end }}
-{{ define "nav" }}
-<a href="/">Live</a> 
-<a href="/events" class="active">Events</a>
-{{ end }}
 {{ define "content" }}
   <div id="opencam">
     <div id="events" class="container-fluid"></div>
   </div>
 {{ end }}
 {{ define "scripts" }}
-  <script>OPENCAM_CAMERAS = {{ json .Cameras }}</script>
+  <script>window.OPENCAM_CAMERAS = {{ json .Cameras }}</script>
   <script src="/static/js/events.js"></script>
 {{ end }}

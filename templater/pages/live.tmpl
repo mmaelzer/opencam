@@ -1,12 +1,8 @@
 {{ define "title" }}opencam{{ end }}
-{{ define "nav" }}
-<a href="/" class="active">Live</a> 
-<a href="/events">Events</a>
-{{ end }}
 {{ define "content" }}
   <div id="opencam">
     <div id="live" class="container-fluid">
-      {{ template "streams" . }} 
+      {{ template "streams" .Cameras }} 
     </div>
   </div>
 {{ end }}

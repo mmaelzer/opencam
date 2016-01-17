@@ -1,0 +1,7 @@
+{{ define "nav" }}
+<div id="nav">
+  <a href="/" {{ if eq .Page "live" }}class="active"{{ end }}>Live</a> 
+  <a href="/events" {{ if eq .Page "events" }}class="active"{{ end }}>Events</a>
+  <a href="/config" {{ if eq .Page "config" }}class="active"{{ end}}>Config</a>
+</div>
+{{ end }}

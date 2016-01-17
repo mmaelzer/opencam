@@ -1,3 +1,11 @@
+.camera {
+  border: 1px solid #ececec;
+  padding: 40px 10px 20px;
+  background: #efefef;
+  box-shadow: 0 0 20px -5px #ccc;
+  border-radius: 3px;
+}
+
 .event {
   margin: 10px 0;
 }
@@ -30,6 +38,10 @@
   width: 0;
   height: 4px;
   background-color: #3F9FFF;
+}
+
+.form-group .camera-frame {
+  width: 100%;
 }
 
 .stream img {

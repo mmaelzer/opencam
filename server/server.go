@@ -32,6 +32,7 @@ func Serve(cameras []*pipeline.Camera) {
 	http.HandleFunc("/", logHandler(controller.LivePage()))
 	http.HandleFunc("/events", logHandler(controller.EventPage()))
 	http.HandleFunc("/live", logHandler(controller.LivePage()))
+	http.HandleFunc("/config", logHandler(controller.ConfigPage()))
 	http.HandleFunc("/static/", logHandler(static))
 	http.HandleFunc("/video/", logHandler(videos))
 	http.HandleFunc("/api/event/", logHandler(controller.Event()))

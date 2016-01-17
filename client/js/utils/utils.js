@@ -40,13 +40,11 @@ export function each (arr, fn) {
 export function findWhere (arr, predicate) {
   return first(filter(arr, (item) => {
     let keys = Object.keys(predicate)
-    let found = true
     for (let i = 0; i < keys.length; i++) {
       let key = keys[i]
-      found = found && item[key] === predicate[key]
-      if (!found) return false
+      if (item[key] !== predicate[key]) return false
     }
-    return found
+    return true
   }))
 }
 
