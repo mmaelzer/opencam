@@ -1,9 +1,44 @@
+#add-camera {
+  margin: 20px 0;
+}
+
+#add-camera .btn-container {
+  text-align: right;
+  padding-right: 10px;
+}
+
+.big {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 0.5;
+}
+
 .camera {
   border: 1px solid #ececec;
   padding: 40px 10px 20px;
   background: #efefef;
   box-shadow: 0 0 20px -5px #ccc;
   border-radius: 3px;
+  margin-bottom: 40px;
+}
+
+.camera-buttons {
+  text-align: right;
+}
+
+.delete-camera {
+  position: relative;
+  right: 10px;
+  float: right;
+  top: -30px;
+  font-size: 20px;
+  background: #D32F2F;
+  width: 28px;
+  color: white;
+  text-align: center;
+  border-radius: 50px;
+  box-shadow: 0 3px 8px -3px #666;
+  cursor: pointer;
 }
 
 .event {

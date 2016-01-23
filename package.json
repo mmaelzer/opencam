@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "config": "browserify client/js/pages/config.js -d -t babelify --outfile client/js/config.js",
     "build": "browserify client/js/pages/events.js -t babelify --outfile client/js/events.js",
     "debug": "browserify client/js/pages/events.js -d -t babelify --outfile client/js/events.js",
     "watch": "reflex -g 'client/js/**/*.js' -R 'bundle.js' -R 'client/js/event.js' -R '^node_modules/' -- npm run debug"
