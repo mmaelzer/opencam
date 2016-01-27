@@ -37,10 +37,10 @@ func Serve(cameras []*pipeline.Camera) {
 	http.HandleFunc("/video/", logHandler(videos))
 	http.HandleFunc("/api/event/", logHandler(controller.Event()))
 	http.HandleFunc("/api/events", logHandler(controller.Events()))
+	http.HandleFunc("/api/camera", logHandler(controller.Cameras()))
 	http.HandleFunc("/stream/", controller.Stream(cameras))
 	http.HandleFunc("/blended/", logHandler(controller.Blended(cameras)))
 	http.HandleFunc("/frame/", logHandler(controller.Frame(cameras)))
-	// http.HandleFunc("/config", logHandler(config))
 
 	port := settings.GetInt("http.port")
 	log.Printf("http listening on %d", port)

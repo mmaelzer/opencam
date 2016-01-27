@@ -12,6 +12,7 @@ export default function (camera = newCamera) {
   let template = `
     <div class="camera form-horizontal col-sm-8 col-sm-offset-2" data-id="${camera.id}">
       <div class="delete-camera" data-id="${camera.id}">X</div>
+      <input name="id" type="hidden" value="${camera.id}">
       <div class="form-group">
         <label class="control-label col-sm-3">
           Camera Name
@@ -20,6 +21,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-name form-control"
                  placeholder="Camera Name"
+                 name="name"
                  value="${camera.name}">
         </div>
       </div>
@@ -29,6 +31,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-url form-control"
                  placeholder="URL"
+                 name="url"
                  value="${camera.url}">
         </div>
       </div>
@@ -38,6 +41,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-user form-control"
                  placeholder="Username"
+                 name="username"
                  value="${camera.username}">
         </div>
       </div>
@@ -47,6 +51,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-user form-control"
                  placeholder="Password"
+                 name="password"
                  value="${camera.password}">
         </div>
       </div>
@@ -56,6 +61,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-min-change form-control"
                  placeholder="Min Change"
+                 name="min_change"
                  value="${camera.min_change}">
         </div>
       </div>
@@ -65,6 +71,7 @@ export default function (camera = newCamera) {
           <input type="text"
                  class="camera-threshold form-control"
                  placeholder="Threshold"
+                 name="threshold"
                  value="${camera.threshold}">
         </div>
       </div>
@@ -81,8 +88,8 @@ export default function (camera = newCamera) {
   }
   template += `
     <div class="camera-buttons" class="btn-group">
-      <button type="button" class="btn btn-primary">Save</button>
-      <button type="button" class="btn btn-default">Cancel</button>
+      <button type="button" class="btn btn-primary save-btn">Save</button>
+      <button type="button" class="btn btn-default cancel-btn">Cancel</button>
     </div>
   </div>
   `

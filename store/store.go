@@ -102,15 +102,33 @@ func GetID(name string, id string, i interface{}) error {
 }
 
 func Save(name string, data interface{}) ([]byte, error) {
+	if name == "camera" {
+		defer cacheCameras()
+	}
 	return post(fmt.Sprintf("%s/%s", sqldURL, name), data)
 }
 
+func Update(name string, data interface{}) ([]byte, error) {
+	if name == "camera" {
+		defer cacheCameras()
+	}
+	return put(fmt.Sprintf("%s/%s", sqldURL, name), data)
+}
+
+func put(url string, i interface{}) ([]byte, error) {
+	return send(url, i, "PUT")
+}
+
 func post(url string, i interface{}) ([]byte, error) {
+	return send(url, i, "POST")
+}
+
+func send(url string, i interface{}, method string) ([]byte, error) {
 	data, err := json.Marshal(i)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	req, err := http.NewRequest(method, url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}

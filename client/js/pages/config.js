@@ -1,26 +1,34 @@
 import cameraConfigTemplate from '../templates/camera-config'
 import rowTemplate from '../templates/row'
 import {
+  breaker,
   contains,
   del,
   filter,
-  first,
   group,
   join,
   map,
   partial,
-  pipe
+  pipe,
+  reduce
 } from '../utils/utils'
 import {
   element,
   findClass,
+  findTags,
   on,
   prepend,
-  remove
+  remove,
+  replace
 } from '../utils/dom'
+import superagent from 'superagent'
+import superagentJson from 'superagent-jsonapify'
+superagentJson(superagent)
 
+const request = superagent
 const camerasDiv = document.getElementById('cameras')
 const cameras = window.OPENCAM_CAMERAS
+const camerasById = group(window.OPENCAM_CAMERAS, 'id')
 const addCameraBtn = document.getElementById('add-camera-btn')
 
 camerasDiv.innerHTML = rowTemplate(
@@ -40,21 +48,55 @@ let cameraElements = group(
 )
 
 on(addCameraBtn, 'click', pipe(
+  partial(breaker, () => 0 in camerasById),
   cameraConfigTemplate,
   element,
-  first,
   partial(prepend, camerasRow),
-  bindCameraEvents
+  bindCameraEvents,
+  () => camerasById[0] = {}
 ))
+
+function gatherCameraInfo (el) {
+  let inputs = findTags(el, 'input')
+  return reduce(inputs, (cam, input) => {
+    cam[input.name] = isNaN(+input.value) ? input.value : +input.value
+    return cam
+  }, {})
+}
 
 function bindCameraEvents (cameraEl) {
   let cameraId = cameraEl.dataset.id
-  let deleteEl = findClass(cameraEl, 'delete-camera')
-  on(deleteEl, 'click', () => {
+  let deleteBtn = findClass(cameraEl, 'delete-camera')
+  let saveBtn = findClass(cameraEl, 'save-btn')
+  let cancelBtn = findClass(cameraEl, 'cancel-btn')
+  on(saveBtn, 'click', () => {
+    let info = gatherCameraInfo(cameraEl)
+    request.post('/api/camera')
+           .send(info)
+           .end((err, res) => {
+              console.log(err)
+              console.log(res)
+           })
+    // ajax save camaera
+  })
+
+  on(cancelBtn, 'click', () => {
+    bindCameraEvents(
+      replace(cameraEl,
+        element(
+          cameraConfigTemplate(camerasById[cameraId])
+        )
+      )
+    )
+  })
+
+  on(deleteBtn, 'click', () => {
     if (cameraId > 0) {
-      cameraElements = del(cameraElements, cameraId)
       // ajax delete camera
     }
+    cameraElements = del(cameraElements, cameraId)
     remove(cameraEl)
   })
+
+  return cameraEl
 }

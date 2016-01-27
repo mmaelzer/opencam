@@ -60,7 +60,6 @@ export function isFunction (o) {
   return typeof o === 'function'
 }
 
-
 export function group (arr, prop) {
   return reduce(arr, (obj, item) => {
     let key = result(item, prop)
@@ -79,6 +78,10 @@ export function group (arr, prop) {
 
 export function last (arr) {
   return arr[arr.length - 1]
+}
+
+export function lower (str) {
+  return typeof str === 'string' ? str.toLowerCase() : ''
 }
 
 export function split (str, del) {
@@ -124,10 +127,16 @@ export function pipe (var_args) {
   return function () {
     let res
     for (let i = 0; i < args.length; i++) {
-      res = args[i](res)
+      try {
+        res = args[i](res)
+      } catch (e) { return }
     }
     return res
   }
+}
+
+export function breaker (test) {
+  if (test()) throw new Error()
 }
 
 export function reduce (arr, fn, base) {

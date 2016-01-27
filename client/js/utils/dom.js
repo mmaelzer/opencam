@@ -1,15 +1,23 @@
-export function element (str) {
+import {
+  contains,
+  first,
+  lower
+} from './utils'
+
+export function elements (str) {
   let div = document.createElement('div')
   div.innerHTML = str.trim()
   return div.childNodes
 }
 
 export function on (el, event, listener, useCapture = false) {
-  return el.addEventListener(event, listener, useCapture)
+  el.addEventListener(event, listener, useCapture)
+  return el
 }
 
 export function off (el, event, listener) {
-  return el.removeEventListener(event, listener)
+  el.removeEventListener(event, listener)
+  return el
 }
 
 export function prepend (parent, child) {
@@ -25,11 +33,20 @@ export function remove (el) {
   return el.parentElement.removeChild(el)
 }
 
+export function replace (oldEl, newEl) {
+  oldEl.parentElement.replaceChild(newEl, oldEl)
+  return newEl
+}
+
+export function element (str) {
+  return first(elements(str))
+}
+
 export function findClass (el, className) {
   if (!el) return null
   if (el.className === className) return el
   for (let i = 0; i < el.childNodes.length; i++) {
-    if (el.childNodes[i].className === className) {
+    if (contains(el.childNodes[i].className, className)) {
       return el.childNodes[i]
     } else {
       let found = findClass(el.childNodes[i], className)
@@ -37,4 +54,17 @@ export function findClass (el, className) {
     }
   }
   return null
+}
+
+export function findTags (el, tagName) {
+  if (!el) return []
+  let tags = []
+  for (let i = 0; i < el.childNodes.length; i++) {
+    if (lower(el.childNodes[i].tagName) === tagName) {
+      tags.push(el.childNodes[i])
+    } else {
+      tags = tags.concat(findTags(el.childNodes[i], tagName))
+    }
+  }
+  return tags
 }
