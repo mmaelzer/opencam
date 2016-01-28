@@ -2,6 +2,7 @@ import cameraConfigTemplate from '../templates/camera-config'
 import rowTemplate from '../templates/row'
 import {
   breaker,
+  captureErr,
   contains,
   del,
   filter,
@@ -34,6 +35,8 @@ const addCameraBtn = document.getElementById('add-camera-btn')
 camerasDiv.innerHTML = rowTemplate(
   join(map(cameras, cameraConfigTemplate))
 )
+
+const reload = () => window.location.href = window.location.href
 
 const camerasRow = camerasDiv.firstChild
 map(
@@ -73,11 +76,7 @@ function bindCameraEvents (cameraEl) {
     let info = gatherCameraInfo(cameraEl)
     request.post('/api/camera')
            .send(info)
-           .end((err, res) => {
-              console.log(err)
-              console.log(res)
-           })
-    // ajax save camaera
+           .end(captureErr(reload))
   })
 
   on(cancelBtn, 'click', () => {
