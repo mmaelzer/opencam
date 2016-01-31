@@ -125,7 +125,7 @@ func Blended(cameras []*pipeline.Camera) http.HandlerFunc {
 		frame2 := <-frames
 		camera.Unsubscribe(frames)
 
-		blended := getBlendedImage(&frame1, &frame2)
+		blended := getBlendedImage(&frame1, &frame2, camera)
 
 		var b bytes.Buffer
 		err = jpeg.Encode(&b, blended, nil)
@@ -138,7 +138,7 @@ func Blended(cameras []*pipeline.Camera) http.HandlerFunc {
 	}
 }
 
-func getBlendedImage(frame1, frame2 *cam.Frame) image.Image {
+func getBlendedImage(frame1, frame2 *cam.Frame, camera *pipeline.Camera) image.Image {
 	jpg1, err := jpeg.Decode(bytes.NewReader(frame1.Bytes))
 	if err != nil {
 		return nil
@@ -147,5 +147,5 @@ func getBlendedImage(frame1, frame2 *cam.Frame) image.Image {
 	if err != nil {
 		return nil
 	}
-	return camotion.Blended(jpg1, jpg2, 2500)
+	return camotion.Blended(jpg1, jpg2, camera.Threshold)
 }

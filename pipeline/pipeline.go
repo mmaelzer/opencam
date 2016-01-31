@@ -11,7 +11,9 @@ type StreamFunc func(chan Block) chan Block
 type WriterFunc func(Block)
 
 type Camera struct {
-	ID uint64 `json:"id"`
+	ID        uint64 `json:"id"`
+	MinChange int    `json:"min_change"`
+	Threshold int    `json:"threshold"`
 	cam.Camera
 }
 

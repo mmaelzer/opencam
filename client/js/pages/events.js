@@ -62,7 +62,9 @@ function play (eventId, frames, div) {
       delete players[eventId]
       return
     }
-    if (i > 0) div.removeChild(frames[i - 1])
+    if (i > 0) {
+      div.removeChild(frames[i - 1])
+    }
     div.appendChild(frames[i])
     progress.style.width = ((100 * (i + 1)) / frames.length) + '%'
     const timeout = getTimeout(frames[i], frames[i + 1])

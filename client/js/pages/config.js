@@ -62,7 +62,9 @@ on(addCameraBtn, 'click', pipe(
 function gatherCameraInfo (el) {
   let inputs = findTags(el, 'input')
   return reduce(inputs, (cam, input) => {
-    cam[input.name] = isNaN(+input.value) ? input.value : +input.value
+    if (input.value) {
+      cam[input.name] = isNaN(+input.value) ? input.value : +input.value
+    }
     return cam
   }, {})
 }
@@ -74,6 +76,9 @@ function bindCameraEvents (cameraEl) {
   let cancelBtn = findClass(cameraEl, 'cancel-btn')
   on(saveBtn, 'click', () => {
     let info = gatherCameraInfo(cameraEl)
+    if (info.id === 0) {
+      del(info, 'id')
+    }
     request.post('/api/camera')
            .send(info)
            .end(captureErr(reload))

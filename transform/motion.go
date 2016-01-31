@@ -49,7 +49,7 @@ func readFrames(in chan pipeline.Block, out chan pipeline.Block) {
 func processFrames(frames []cam.Frame, camera *pipeline.Camera, out chan pipeline.Block, lock sync.Locker) {
 	firstFrame := frames[0]
 	lastFrame := frames[len(frames)-1]
-	motion := testFrames(&firstFrame, &lastFrame)
+	motion := testFrames(&firstFrame, &lastFrame, camera)
 
 	if motion {
 		log.Printf(
@@ -67,7 +67,7 @@ func processFrames(frames []cam.Frame, camera *pipeline.Camera, out chan pipelin
 	lock.Unlock()
 }
 
-func testFrames(frame1, frame2 *cam.Frame) bool {
+func testFrames(frame1, frame2 *cam.Frame, camera *pipeline.Camera) bool {
 	jpg1, err := jpeg.Decode(bytes.NewReader(frame1.Bytes))
 	if err != nil {
 		return false
@@ -76,5 +76,5 @@ func testFrames(frame1, frame2 *cam.Frame) bool {
 	if err != nil {
 		return false
 	}
-	return camotion.MotionWithStep(jpg1, jpg2, 10, 2500, 10)
+	return camotion.MotionWithStep(jpg1, jpg2, camera.MinChange, camera.Threshold, 10)
 }

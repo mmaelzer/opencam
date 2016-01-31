@@ -84,6 +84,12 @@ export default function (camera = newCamera) {
         <img class="camera-frame" src="/frame/${camera.id}">
       </div>
     </div>
+    <div class="form-group">
+      <label class="control-label col-sm-3">Motion</label>
+      <div class="col-sm-8">
+        <img class="camera-frame" src="/blended/${camera.id}">
+      </div>
+    </div>
     `
   }
   template += `

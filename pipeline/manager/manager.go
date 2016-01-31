@@ -47,6 +47,12 @@ func Cameras() []*pipeline.Camera {
 	return p.Cameras()
 }
 
+func Restart() {
+	log.Print("Restaring pipeline...")
+	p.Stop()
+	p.Start()
+}
+
 func Stop() {
 	p.Stop()
 	p = nil

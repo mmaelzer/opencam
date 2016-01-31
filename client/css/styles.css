@@ -1,5 +1,6 @@
-#add-camera {
-  margin: 20px 0;
+#add-camera-btn {
+  padding: 10px 10px;
+  margin: 20px -10px 20px;
 }
 
 #add-camera .btn-container {
@@ -13,10 +14,33 @@
   line-height: 0.5;
 }
 
+.btn-primary {
+  background-color: #2196F3;
+  border-radius: 0;
+  box-shadow: 0 3px 8px -3px #666;
+  border-color: transparent;
+}
+
+.btn-primary:hover {
+  border-color: transparent;
+}
+
+.btn-default {
+  color: #333333;
+  background-color: #ffffff;
+  border-radius: 0;
+  border-color: transparent;
+  box-shadow: 0 3px 8px -3px #666;
+}
+
+.btn-default:hover {
+  border-color: transparent;
+}
+
 .camera {
   border: 1px solid #ececec;
   padding: 40px 10px 20px;
-  background: #efefef;
+  background: #f8f8f8;
   box-shadow: 0 8px 8px -4px #ccc;
   border-radius: 3px;
   margin-bottom: 40px;

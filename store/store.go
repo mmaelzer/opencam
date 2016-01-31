@@ -22,10 +22,10 @@ var cameraCache map[int]model.Camera
 
 func Initialize(url string) {
 	sqldURL = strings.TrimSuffix(url, "/")
-	cacheCameras()
+	CacheCameras()
 }
 
-func cacheCameras() {
+func CacheCameras() {
 	var cameras []model.Camera
 	err := Get("camera", &cameras)
 	if err != nil {
@@ -102,17 +102,11 @@ func GetID(name string, id string, i interface{}) error {
 }
 
 func Save(name string, data interface{}) ([]byte, error) {
-	if name == "camera" {
-		defer cacheCameras()
-	}
 	return post(fmt.Sprintf("%s/%s", sqldURL, name), data)
 }
 
-func Update(name string, data interface{}) ([]byte, error) {
-	if name == "camera" {
-		defer cacheCameras()
-	}
-	return put(fmt.Sprintf("%s/%s", sqldURL, name), data)
+func Update(name string, data interface{}, id string) ([]byte, error) {
+	return put(fmt.Sprintf("%s/%s/%s", sqldURL, name, id), data)
 }
 
 func put(url string, i interface{}) ([]byte, error) {
