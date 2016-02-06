@@ -3,9 +3,13 @@ import superagentJson from 'superagent-jsonapify'
 import eventTemplate from '../templates/event'
 import rowTemplate from '../templates/row'
 import {
+  empty
+} from '../utils/dom'
+import {
   _,
   after,
   captureErr,
+  del,
   each,
   first,
   join,
@@ -46,26 +50,27 @@ function getEvents (page, callback) {
 function buildImageForFrame (frame) {
   const image = new window.Image()
   image.src = frame
+  image.className = 'event-image'
   return image
 }
 
-function play (eventId, frames, div) {
-  while (div.hasChildNodes()) {
-    div.removeChild(div.lastChild)
-  }
+function play (eventId, frames, container) {
+  const info = first(
+    container.getElementsByClassName('event-info')
+  )
   const progress = first(
-    div.parentElement.getElementsByClassName('event-video-progress')
+    container.getElementsByClassName('event-video-progress')
   )
   progress.style.width = '0%'
+  info.style.opacity = 0
   function loadFrame (i) {
     if (i === frames.length) {
-      delete players[eventId]
+      info.style.opacity = 1
+      del(players, eventId)
       return
     }
-    if (i > 0) {
-      div.removeChild(frames[i - 1])
-    }
-    div.appendChild(frames[i])
+    let img = first(container.getElementsByClassName('event-image'))
+    container.replaceChild(frames[i], img)
     progress.style.width = ((100 * (i + 1)) / frames.length) + '%'
     const timeout = getTimeout(frames[i], frames[i + 1])
     players[eventId] = window.setTimeout(partial(loadFrame, i + 1), timeout)
@@ -75,23 +80,23 @@ function play (eventId, frames, div) {
 
 function playEvent (el) {
   return function (event) {
-    let imgContainer = first(el.getElementsByClassName('event-image-container'))
+    let container = first(el.getElementsByClassName('event-image')).parentElement
     // If playing, stop the player
     if (event.id in players) {
       window.clearTimeout(players[event.id])
-      delete players[event.id]
+      del(players, event.id)
       return
     }
     // If images cached, used cached images instead of
     // fetching new images from the server
     if (event.id in images) {
-      play(event.id, images[event.id], imgContainer)
+      play(event.id, images[event.id], container)
       return
     }
     let frames = map(event.frames, buildImageForFrame)
     let loaded = after(frames.length, () => {
       images[event.id] = frames
-      play(event.id, frames, imgContainer)
+      play(event.id, frames, container)
     })
     each(frames, frame => frame.onload = loaded)
   }

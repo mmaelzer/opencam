@@ -10,6 +10,13 @@ export function elements (str) {
   return div.childNodes
 }
 
+export function empty (el) {
+  while (el.hasChildNodes()) {
+    el.removeChild(el.lastChild)
+  }
+  return el
+}
+
 export function on (el, event, listener, useCapture = false) {
   el.addEventListener(event, listener, useCapture)
   return el

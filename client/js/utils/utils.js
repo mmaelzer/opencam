@@ -21,7 +21,7 @@ export function contains (iterable, val) {
 }
 
 export function del (obj, prop) {
-  delete obj[result(prop)]
+  delete obj[prop]
   return obj
 }
 

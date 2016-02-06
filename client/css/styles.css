@@ -1,3 +1,24 @@
+.trans-opacity {
+  transition: opacity 0.5s;
+}
+
+.fadein {
+  animation-duration: 0.5s;
+  animation-name: fadein;
+}
+
+@keyframes fadein {
+  from {
+    transform: scale(0.93);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1.0);
+    opacity: 1;
+  }
+}
+
 #add-camera-btn {
   padding: 10px 10px;
   margin: 20px -10px 20px;
@@ -69,12 +90,16 @@
   margin: 10px 0;
 }
 
+img.event-image {
+  width: 100%;
+  height: auto;
+}
+
 .event a {
   display: block;
-  border: 1px solid #ddd;
-  padding: 10px;
   box-shadow: 0 0 30px -10px #666;
-  color: #333;
+  color: #fff;
+  background: #000;
 }
 
 .event a:hover {
@@ -82,21 +107,30 @@
 }
 
 .event-info {
-  margin-top: 10px;
+  margin: 10px;
+  position: absolute;
+  bottom: 0;
+  opacity: 1;
 }
 
 .event-info h3 {
-    margin: 0 0 10px;
+  margin: 0 0 10px;
+}
+
+.event-image-container {
+  height: 15%;
 }
 
 .event-image-container img {
+  height: auto;
   width: 100%;
 }
 
 .event-video-progress {
   width: 0;
-  height: 4px;
+  height: 2px;
   background-color: #3F9FFF;
+  float: left;
 }
 
 .form-group .camera-frame {
@@ -108,8 +142,6 @@
 }
 
 .stream-container {
-  border: 1px solid #ddd;
-  padding: 10px;
   box-shadow: 0 0 30px -10px #666;
   color: #333;
   margin: 10px 0;
@@ -117,6 +149,10 @@
 
 .stream-info {
   font-size: 24px;
+  position: absolute;
+  bottom: 0;
+  margin: 20px;
+  color: white;
 }
 
 #nav {

@@ -6,13 +6,11 @@ export default function (event, cameras) {
   const camera = findWhere(cameras, { id: event.camera_id })
   if (!camera) return ''
   return `
-    <div class="event col-lg-3 col-md-4 col-sm-6" data-id="${event.id}">
+    <div class="event fadein col-lg-3 col-md-4 col-sm-6" data-id="${event.id}">
       <a href="/event/${event.id}">
-        <div class="event-image-container">
-          <img class="event-image" src="/video/${event.first_frame}">
-        </div>
+        <img class="event-image" src="/video/${event.first_frame}">
         <div class="event-video-progress"></div>
-        <div class="event-info">
+        <div class="event-info trans-opacity">
           <h3>${camera.name}</h3>
           ${time}<br>
           ${event.duration}s<br>
