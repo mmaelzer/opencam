@@ -12,6 +12,7 @@ func init() {
 	s = viper.New()
 	s.SetConfigType("json")
 	s.SetDefault("http.port", 8080)
+	s.SetDefault("output", "videos")
 }
 
 func Load(r io.Reader) error {

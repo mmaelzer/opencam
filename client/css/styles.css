@@ -87,12 +87,14 @@
 }
 
 .event {
-  margin: 10px 0;
+  padding: 10px 0;
 }
 
 img.event-image {
-  width: 100%;
+  width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .event a {
@@ -100,6 +102,7 @@ img.event-image {
   box-shadow: 0 0 30px -10px #666;
   color: #fff;
   background: #000;
+  text-align: center;
 }
 
 .event a:hover {
@@ -107,10 +110,11 @@ img.event-image {
 }
 
 .event-info {
-  margin: 10px;
+  margin: 20px 10px;
   position: absolute;
   bottom: 0;
   opacity: 1;
+  text-align: left;
 }
 
 .event-info h3 {
@@ -128,9 +132,9 @@ img.event-image {
 
 .event-video-progress {
   width: 0;
-  height: 2px;
+  height: 3px;
   background-color: #3F9FFF;
-  float: left;
+  position: relative;
 }
 
 .form-group .camera-frame {
