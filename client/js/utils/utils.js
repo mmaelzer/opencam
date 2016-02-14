@@ -16,6 +16,10 @@ export function after (times, fn) {
   return () => { if (++calls === times) fn() }
 }
 
+export function breaker (test) {
+  if (test()) throw new Breaker()
+}
+
 export function contains (iterable, val) {
   return iterable && iterable.indexOf(val) >= 0
 }
@@ -130,14 +134,17 @@ export function pipe (var_args) {
     for (let i = 0; i < args.length; i++) {
       try {
         res = args[i](res)
-      } catch (e) { return }
+      } catch (e) {
+        if (e instanceof Breaker) return
+        throw e
+      }
     }
     return res
   }
 }
 
-export function breaker (test) {
-  if (test()) throw new Error()
+export function pluck (arr, prop) {
+  return map(arr, partial(result, _, prop))
 }
 
 export function reduce (arr, fn, base) {
@@ -148,3 +155,9 @@ export function result (obj, getter) {
   return isFunction(getter) ? getter(obj) : obj[getter]
 }
 
+export function without (arr, val) {
+  let test = typeof val === 'function' ? val : (v) => v !== val
+  return filter(arr, test)
+}
+
+class Breaker extends Error {}

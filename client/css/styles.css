@@ -141,6 +141,25 @@ img.event-image {
   width: 100%;
 }
 
+ul.filter-options {
+  list-style: none;
+}
+
+li.filter-camera {
+  display: inline-block;
+}
+
+li.filter-camera.active a {
+  background: #337ab7;
+  color: white;
+}
+
+li.filter-camera a {
+  padding: 5px 10px;
+  text-decoration: none;
+  color: black;
+}
+
 .stream img {
   width: 100%;
 }

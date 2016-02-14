@@ -1,7 +1,10 @@
 import {
   contains,
   first,
-  lower
+  join,
+  lower,
+  split,
+  without
 } from './utils'
 
 export function elements (str) {
@@ -74,4 +77,22 @@ export function findTags (el, tagName) {
     }
   }
   return tags
+}
+
+export function hasClass (el, className) {
+  return contains(el.className, className)
+}
+
+export function removeClass (el, className) {
+  el.className = join(without(split(el.className, ' '), className), ' ')
+  return el
+}
+
+export function addClass (el, className) {
+  el.className += ' ' + className
+  return el
+}
+
+export function toggleClass (el, className) {
+  return hasClass(el, className) ? removeClass(el, className) : addClass(el, className)
 }

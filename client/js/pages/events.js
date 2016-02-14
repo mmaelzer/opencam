@@ -3,7 +3,10 @@ import superagentJson from 'superagent-jsonapify'
 import eventTemplate from '../templates/event'
 import rowTemplate from '../templates/row'
 import {
-  empty
+  hasClass,
+  off,
+  on,
+  toggleClass
 } from '../utils/dom'
 import {
   _,
@@ -11,11 +14,13 @@ import {
   captureErr,
   del,
   each,
+  filter,
   first,
   join,
   last,
   map,
   partial,
+  pluck,
   split
 } from '../utils/utils'
 superagentJson(superagent)
@@ -42,6 +47,14 @@ function getEventWithFrames (id, callback) {
 
 function getEvents (page, callback) {
   const url = '/api/events?page=' + page
+  request.get(url).end(captureErr((res) => {
+    callback(null, Array.isArray(res.body) ? res.body : [])
+  }))
+}
+
+function getEventsForCameras (cameras, page, callback) {
+  let cameraQuery = join(map(cameras, (c) => 'camera_id=' + c), '&')
+  const url = '/api/events?page=' + page + '&' + cameraQuery
   request.get(url).end(captureErr((res) => {
     callback(null, Array.isArray(res.body) ? res.body : [])
   }))
@@ -109,8 +122,8 @@ function onEventClick (e) {
 }
 
 function buildEventEl (el) {
-  el.addEventListener('click', onEventClick, true)
-  return () => el.removeEventListener('click', onEventClick)
+  on(el, 'click', onEventClick)
+  return partial(off, el, 'click', onEventClick)
 }
 
 function renderEvents (events) {
@@ -123,6 +136,25 @@ function renderEvents (events) {
   return map(eventsEl, buildEventEl)
 }
 
+function bindFilters () {
+  let filters = document.getElementsByClassName('filter-camera')
+  map(filters, (cam) => {
+    on(cam, 'click', (e) => {
+      e.preventDefault()
+      toggleClass(cam, 'active')
+      let activeCameraIds = map(
+        filter(
+          filters,
+          partial(hasClass, _, 'active')
+        ),
+        (c) => c.dataset.id
+      )
+      getEventsForCameras(activeCameraIds, 1, captureErr(renderEvents))
+    })
+  })
+}
+
 (function main () {
   getEvents(1, captureErr(renderEvents))
+  bindFilters()
 })()

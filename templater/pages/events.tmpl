@@ -1,6 +1,20 @@
 {{ define "title" }}opencam{{ end }}
 {{ define "content" }}
   <div id="opencam">
+    <div id="filter-container">
+      <div class="filter">
+        <label class="filter-label">Cameras</label>
+        <ul id="filter-cameras" class="filter-options">
+          {{ range .Cameras }}
+            <li class="filter-camera active" data-id="{{.ID}}">
+              <a href="">
+                {{.Name}}
+              </a>
+            </li>
+          {{ end }}
+        </ul>
+      </div>
+    </div>
     <div id="events" class="container-fluid"></div>
   </div>
 {{ end }}
