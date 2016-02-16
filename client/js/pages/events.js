@@ -16,11 +16,11 @@ import {
   each,
   filter,
   first,
+  invoke,
   join,
   last,
   map,
   partial,
-  pluck,
   split
 } from '../utils/utils'
 superagentJson(superagent)
@@ -28,6 +28,7 @@ superagentJson(superagent)
 const request = superagent
 const players = {}
 const images = {}
+let unbindListeners = []
 
 function getTimeout (image1, image2) {
   if (typeof image1 === 'undefined' || typeof image2 === 'undefined') {
@@ -127,13 +128,14 @@ function buildEventEl (el) {
 }
 
 function renderEvents (events) {
+  invoke(unbindListeners)
   const cameras = window.OPENCAM_CAMERAS
   const eventsDiv = document.getElementById('events')
   eventsDiv.innerHTML = rowTemplate(
     join(map(events, partial(eventTemplate, _, cameras)))
   )
   const eventsEl = document.getElementsByClassName('event')
-  return map(eventsEl, buildEventEl)
+  unbindListeners = map(eventsEl, buildEventEl)
 }
 
 function bindFilters () {

@@ -60,6 +60,10 @@ export function flatten (arr) {
   return reduce(arr, i => arr.concat(array(i)), [])
 }
 
+export function invoke (arr, var_args) {
+  return map(arr, fn => fn.call(this, ...slice(arguments, 1)))
+}
+
 export function isFunction (o) {
   return typeof o === 'function'
 }
