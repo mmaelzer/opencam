@@ -141,20 +141,29 @@ img.event-image {
   width: 100%;
 }
 
+#filter-container {
+  padding: 10px;
+}
+
+label.filter-label {
+  float: left;
+  margin: 0 10px;
+}
+
 ul.filter-options {
   list-style: none;
 }
 
-li.filter-camera {
+.filter li {
   display: inline-block;
 }
 
-li.filter-camera.active a {
+.filter li.active a {
   background: #337ab7;
   color: white;
 }
 
-li.filter-camera a {
+.filter li a {
   padding: 5px 10px;
   text-decoration: none;
   color: black;

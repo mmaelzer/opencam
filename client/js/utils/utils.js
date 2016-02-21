@@ -57,7 +57,7 @@ export function first (arr) {
 }
 
 export function flatten (arr) {
-  return reduce(arr, i => arr.concat(array(i)), [])
+  return reduce(arr, (flat, i) => flat.concat(array(i)), [])
 }
 
 export function invoke (arr, var_args) {
@@ -72,16 +72,16 @@ export function group (arr, prop) {
   return reduce(arr, (obj, item) => {
     let key = result(item, prop)
     if (key in obj) {
-      if (Array.isArray(obj[key])) {
-        obj[key].push(item)
-      } else {
-        obj[key] = [obj[key], item]
-      }
+      obj[key].push(item)
     } else {
-      obj[key] = item
+      obj[key] = [item]
     }
     return obj
   }, {})
+}
+
+export function join (arr, str = '') {
+  return Array.prototype.join.call(arr, str)
 }
 
 export function last (arr) {
@@ -112,9 +112,21 @@ export function mapStep (arr, count, fn) {
   return results
 }
 
-export function join (arr, str) {
-  str = arguments.length === 1 ? '' : str
-  return Array.prototype.join.call(arr, str)
+export function parallel (arr, iterator, callback = _) {
+  let results = []
+  let called = 0
+  for (let i = 0; i < arr.length; i++) iterate(i)
+  function iterate (index) {
+    iterator(arr[index], (err, result) => {
+      if (called === -1) return
+      if (err) {
+        called = -1
+        return callback(err)
+      }
+      results[index] = result
+      if (++called === arr.length) callback(undefined, results)
+    }, index)
+  }
 }
 
 export function partial (fn, var_args) {
@@ -157,6 +169,25 @@ export function reduce (arr, fn, base) {
 
 export function result (obj, getter) {
   return isFunction(getter) ? getter(obj) : obj[getter]
+}
+
+export function propSorter (prop) {
+  return (a, b) => {
+    let ra = result(a, prop)
+    let rb = result(b, prop)
+    if (ra > rb) return -1
+    if (ra < rb) return 1
+    return 0
+  }
+}
+
+export function sort (arr, prop) {
+  let fn = typeof prop === 'string' ? propSorter(prop) : prop
+  return Array.prototype.sort.call(arr, fn)
+}
+
+export function values (dict) {
+  return map(Object.keys(dict), key => dict[key])
 }
 
 export function without (arr, val) {
