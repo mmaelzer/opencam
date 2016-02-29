@@ -30,6 +30,7 @@ var create_tables string = `
 	);
 
 	CREATE INDEX IF NOT EXISTS cam_start_end_duration ON event(camera_id, start_time, end_time, duration);
+	CREATE INDEX IF NOT EXISTS filepath_idx ON event(filepath);
 
 	CREATE TABLE IF NOT EXISTS setting (
 		id INTEGER PRIMARY KEY,

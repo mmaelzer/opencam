@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -15,6 +16,11 @@ import (
 	"github.com/mmaelzer/opencam/model"
 	"github.com/mmaelzer/opencam/pipeline"
 	"github.com/mmaelzer/opencam/settings"
+)
+
+const (
+	DATE_FORMAT = "2006-01-02"
+	TIME_FORMAT = "15_04_05"
 )
 
 var sqldURL string
@@ -49,11 +55,11 @@ func FolderForBlock(block pipeline.Block) string {
 	folder := fmt.Sprintf(
 		"%d-%s-%d",
 		block.Camera.ID,
-		ff.Timestamp.Format("15_04_05"),
+		ff.Timestamp.Format(TIME_FORMAT),
 		duration,
 	)
 
-	dateDir := ff.Timestamp.Format("2006-01-02")
+	dateDir := ff.Timestamp.Format(DATE_FORMAT)
 	relativePath := path.Join(dateDir, folder)
 	return relativePath
 }
@@ -107,6 +113,15 @@ func Save(name string, data interface{}) ([]byte, error) {
 
 func Update(name string, data interface{}, id string) ([]byte, error) {
 	return put(fmt.Sprintf("%s/%s/%s", sqldURL, name, id), data)
+}
+
+func Delete(name string, params map[string]string) ([]byte, error) {
+	v := url.Values{}
+	for key, val := range params {
+		v.Set(key, val)
+	}
+	url := fmt.Sprintf("%s/%s?%s", sqldURL, name, v.Encode())
+	return send(url, nil, "DELETE")
 }
 
 func put(url string, i interface{}) ([]byte, error) {

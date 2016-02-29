@@ -5,4 +5,5 @@ settings.json
 .DS_Store
 deploy.yml
 client/js/bundle.js
+client/js/config.js
 client/js/events.js

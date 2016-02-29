@@ -2,6 +2,7 @@ package settings
 
 import (
 	"io"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -13,6 +14,7 @@ func init() {
 	s.SetConfigType("json")
 	s.SetDefault("http.port", 8080)
 	s.SetDefault("output", "videos")
+	s.SetDefault("retention", time.Hour*24*7)
 }
 
 func Load(r io.Reader) error {

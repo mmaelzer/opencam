@@ -59,5 +59,6 @@ func main() {
 
 	handleFlags()
 	manager.Start()
+	store.InitTrim()
 	server.Serve(manager.Cameras())
 }
